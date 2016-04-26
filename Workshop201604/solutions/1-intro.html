@@ -215,7 +215,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[18]:</div>
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># This code block defined your token and makes it available as a </span>
@@ -224,6 +224,9 @@ div#notebook {
 <span class="c1"># This will usually be the first code block in any script you write.</span>
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;/home/idies/keystone.token&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">token</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="c1"># async queries require token to be in --ident system variable</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--ident=&quot;</span><span class="o">+</span><span class="n">token</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Your current token is&quot;</span><span class="o">+</span><span class="n">token</span><span class="p">)</span>
 </pre></div>
 
@@ -259,7 +262,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[19]:</div>
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Step 2a: Import Python libraries to work with SciServer</span>
@@ -275,7 +278,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[20]:</div>
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># step 2b import other libraries for use in this notebook.</span>
@@ -297,7 +300,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[21]:</div>
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Step 2b: Apply some special settings to the imported libraries</span>
@@ -13161,9 +13164,123 @@ uploadCVSDataFrameToTable POST response:  200 OK
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Check-the-state-of-your-MyDB-after:--http://scitest02.pha.jhu.edu/CasJobs/MyDB.aspx">Check the state of your MyDB after:  <a href="http://scitest02.pha.jhu.edu/CasJobs/MyDB.aspx">http://scitest02.pha.jhu.edu/CasJobs/MyDB.aspx</a><a class="anchor-link" href="#Check-the-state-of-your-MyDB-after:--http://scitest02.pha.jhu.edu/CasJobs/MyDB.aspx">&#182;</a></h3>
+<p>Check the state of your MyDB after:  <a href="http://scitest02.pha.jhu.edu/CasJobs/MyDB.aspx">http://scitest02.pha.jhu.edu/CasJobs/MyDB.aspx</a></p>
+
 </div>
 </div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Epilogue:-Async-queries-to-CasJobs">Epilogue: Async queries to CasJobs<a class="anchor-link" href="#Epilogue:-Async-queries-to-CasJobs">&#182;</a></h2><p>instead of executing a query, a query job can be submitted.
+Returns with a jobId, wbout which the status can be requested.</p>
+<p>Important: for now the result of the query MUST be written explicitly to a table.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[16]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># async query example. Note the SELECT ... INTO ... pattern</span>
+<span class="n">query</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">SELECT TOP 16 p.objId,p.ra,p.dec,p.petror90_r</span>
+<span class="s2">into MyDB.intro1query</span>
+<span class="s2">  FROM galaxy AS p</span>
+<span class="s2">   JOIN SpecObj AS s ON s.bestobjid = p.objid</span>
+<span class="s2">WHERE p.u BETWEEN 0 AND 19.6</span>
+<span class="s2">  AND p.g BETWEEN 0 AND 17</span>
+<span class="s2">  AND p.petror90_r &gt; 10</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">jobId</span><span class="o">=</span><span class="n">CasJobs</span><span class="o">.</span><span class="n">submitJob</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">context</span> <span class="o">=</span> <span class="s2">&quot;DR12&quot;</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>submitJob PUT response:  200 OK
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[18]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># retrieve status about job</span>
+<span class="c1"># returns a JSON string.</span>
+<span class="c1"># job is complet is Status attribute in (3,4,5)</span>
+<span class="n">CasJobs</span><span class="o">.</span><span class="n">getJobStatus</span><span class="p">(</span><span class="n">jobId</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt output_prompt">Out[18]:</div>
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>{&apos;AutoComplete&apos;: 0,
+ &apos;Created_Table&apos;: &apos;intro1query&apos;,
+ &apos;Estimate&apos;: 500,
+ &apos;HostIP&apos;: &apos;DR12_long      &apos;,
+ &apos;JobID&apos;: 541025,
+ &apos;Message&apos;: &apos;Query Complete&apos;,
+ &apos;ModifiedQuery&apos;: &apos;SELECT TOP 16 p.objId,p.ra,p.dec,p.petror90_r\n\n  FROM galaxy AS p\n   JOIN SpecObj AS s ON s.bestobjid = p.objid\nWHERE p.u BETWEEN 0 AND 19.6\n  AND p.g BETWEEN 0 AND 17\n  AND p.petror90_r &gt; 10/*CASJOBS_INTO_TABLE:[scitest02].mydb_958083076.mydb.intro1query*/&apos;,
+ &apos;OutputLoc&apos;: &apos;&apos;,
+ &apos;OutputType&apos;: &apos;QUERY&apos;,
+ &apos;Params&apos;: &apos;&apos;,
+ &apos;Query&apos;: &apos;\nSELECT TOP 16 p.objId,p.ra,p.dec,p.petror90_r\ninto MyDB.intro1query\n  FROM galaxy AS p\n   JOIN SpecObj AS s ON s.bestobjid = p.objid\nWHERE p.u BETWEEN 0 AND 19.6\n  AND p.g BETWEEN 0 AND 17\n  AND p.petror90_r &gt; 10\n&apos;,
+ &apos;Rows&apos;: 16,
+ &apos;SendEmail&apos;: 0,
+ &apos;Status&apos;: 5,
+ &apos;Target&apos;: &apos;DR12&apos;,
+ &apos;TaskName&apos;: &apos;REST Job Task&apos;,
+ &apos;TimeEnd&apos;: &apos;2016-04-26T18:33:39.507&apos;,
+ &apos;TimeStart&apos;: &apos;2016-04-26T18:33:38.517&apos;,
+ &apos;TimeSubmit&apos;: &apos;2016-04-26T18:33:34.51&apos;,
+ &apos;WebServicesID&apos;: 958083076}</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span> 
+</pre></div>
+
+</div>
+</div>
+</div>
+
 </div>
     </div>
   </div>
