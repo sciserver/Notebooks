@@ -60,3 +60,6 @@ target/
 
 #Ipython Notebook
 .ipynb_checkpoints
+
+#Weird file that GitHub adds when Jordan uses a Mac
+.DS_Store
