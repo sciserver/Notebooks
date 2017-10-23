@@ -22,8 +22,10 @@ galaxyTree<-function(root="0", tableName="MRscPlanck1",context="Henriques2015a",
      and p.galaxyId between d.galaxyId and d.lastprogenitorid
    order by p.galaxyId
   ",sep="")
+#  print(sql)
 #  data<-queryCAS(sql,token=token,context=context)  old version
-  data <- CasJobs.executeQuery(sql, context=context)
+  data <- CasJobs.executeQuery(sql, context=context, format='csv')
+  data = read.csv(textConnection(data))
   for(i in 2:length(data))
     data[,i]<-as.numeric(data[,i])
   tree<-list()
