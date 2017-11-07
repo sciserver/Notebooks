@@ -1,2 +1,2 @@
 # Notebooks
-For iPython/Jupyther Notebooks used in SciServer outreach activities.
+For scientifically-oriented iPython/Jupyther Notebooks used in SciServer Science Outreach activities.
